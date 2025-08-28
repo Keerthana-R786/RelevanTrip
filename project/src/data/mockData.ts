@@ -15,7 +15,7 @@ export const mockPlaces: Place[] = [
     safetyScore: 9.2,
     crowdLevel: 'medium',
     weather: 'sunny',
-    price: '$$'
+    price: '$15-25'
   },
   {
     id: '2',
@@ -46,7 +46,7 @@ export const mockPlaces: Place[] = [
     safetyScore: 9.5,
     crowdLevel: 'high',
     weather: 'rainy',
-    price: '$$$'
+    price: '$25-40'
   },
   {
     id: '4',
@@ -62,14 +62,14 @@ export const mockPlaces: Place[] = [
     safetyScore: 8.9,
     crowdLevel: 'low',
     weather: 'sunny',
-    price: '$'
+    price: '$8-15'
   },
   {
     id: '5',
     name: 'Riverside Wellness Spa',
     category: 'wellness',
     rating: 4.5,
-    image: 'https://images.pexels.com/photos/3188831/pexels-photo-3188831.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://images.pexels.com/photos/3771069/pexels-photo-3771069.jpeg?auto=compress&cs=tinysrgb&w=800',
     address: '654 River Walk, Wellness District',
     contact: '+1 (555) 234-5678',
     hours: '9:00 AM - 8:00 PM',
@@ -78,7 +78,7 @@ export const mockPlaces: Place[] = [
     safetyScore: 9.0,
     crowdLevel: 'medium',
     weather: 'sunny',
-    price: '$$$$'
+    price: '$80-150'
   },
   {
     id: '6',
@@ -94,7 +94,7 @@ export const mockPlaces: Place[] = [
     safetyScore: 8.3,
     crowdLevel: 'high',
     weather: 'clear',
-    price: '$$$'
+    price: '$45-75'
   }
 ];
 

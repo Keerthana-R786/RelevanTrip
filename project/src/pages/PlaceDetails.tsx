@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -13,7 +13,9 @@ import {
   ExternalLink,
   Heart,
   Share2,
-  Navigation
+  Navigation,
+  Copy,
+  Check
 } from 'lucide-react';
 import { mockPlaces } from '../data/mockData';
 import { useApp } from '../contexts/AppContext';
@@ -23,9 +25,29 @@ const PlaceDetails: React.FC = () => {
   const navigate = useNavigate();
   const { savedPlaces, setSavedPlaces } = useApp();
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const shareMenuRef = useRef<HTMLDivElement>(null);
 
   const place = mockPlaces.find(p => p.id === id);
   const isSaved = savedPlaces.some(p => p.id === id);
+
+  // Close share menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+        setShowShareMenu(false);
+      }
+    };
+
+    if (showShareMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showShareMenu]);
 
   if (!place) {
     return (
@@ -45,6 +67,38 @@ const PlaceDetails: React.FC = () => {
       setSavedPlaces(savedPlaces.filter(p => p.id !== place.id));
     } else {
       setSavedPlaces([...savedPlaces, place]);
+    }
+  };
+
+  const handleShare = () => {
+    setShowShareMenu(!showShareMenu);
+  };
+
+  const copyToClipboard = async () => {
+    const placeUrl = `${window.location.origin}/place/${place.id}`;
+    try {
+      await navigator.clipboard.writeText(placeUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  const shareViaWebAPI = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: place.name,
+          text: `Check out this amazing place: ${place.name}`,
+          url: `${window.location.origin}/place/${place.id}`,
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback to copy link
+      copyToClipboard();
     }
   };
 
@@ -108,8 +162,43 @@ const PlaceDetails: React.FC = () => {
                 >
                   <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
                 </button>
-                <button className="p-2 rounded-full bg-white/80 text-gray-600 hover:bg-white backdrop-blur-sm transition-all hover:scale-110">
+                <button 
+                  onClick={handleShare}
+                  className="p-2 rounded-full bg-white/80 text-gray-600 hover:bg-white backdrop-blur-sm transition-all hover:scale-110 relative"
+                >
                   <Share2 className="h-5 w-5" />
+                  
+                  {/* Share Menu */}
+                  {showShareMenu && (
+                    <div 
+                      ref={shareMenuRef}
+                      className="absolute top-12 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-2 z-20 min-w-[160px]"
+                    >
+                      <button
+                        onClick={shareViaWebAPI}
+                        className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                      >
+                        <Share2 className="h-4 w-4" />
+                        <span>Share</span>
+                      </button>
+                      <button
+                        onClick={copyToClipboard}
+                        className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span className="text-green-600">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            <span>Copy Link</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </button>
               </div>
             </div>

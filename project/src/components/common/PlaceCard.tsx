@@ -9,13 +9,10 @@ import {
   Heart, 
   Bookmark,
   ExternalLink,
-<<<<<<< HEAD
   Share2,
   Copy,
-  Check
-=======
+  Check,
   DollarSign
->>>>>>> c25b35716aec0623de46f555019edc0e9301a40b
 } from 'lucide-react';
 import { Place } from '../../types';
 import { useApp } from '../../contexts/AppContext';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Star, 
@@ -8,7 +8,10 @@ import {
   Leaf, 
   Heart, 
   Bookmark,
-  ExternalLink
+  ExternalLink,
+  Share2,
+  Copy,
+  Check
 } from 'lucide-react';
 import { Place } from '../../types';
 import { useApp } from '../../contexts/AppContext';
@@ -25,7 +28,27 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
   showBookButton = true 
 }) => {
   const { savedPlaces, setSavedPlaces } = useApp();
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const shareMenuRef = useRef<HTMLDivElement>(null);
   const isSaved = savedPlaces.some(p => p.id === place.id);
+
+  // Close share menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+        setShowShareMenu(false);
+      }
+    };
+
+    if (showShareMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showShareMenu]);
 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -33,6 +56,39 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
       setSavedPlaces(savedPlaces.filter(p => p.id !== place.id));
     } else {
       setSavedPlaces([...savedPlaces, place]);
+    }
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowShareMenu(!showShareMenu);
+  };
+
+  const copyToClipboard = async () => {
+    const placeUrl = `${window.location.origin}/place/${place.id}`;
+    try {
+      await navigator.clipboard.writeText(placeUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  const shareViaWebAPI = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: place.name,
+          text: `Check out this amazing place: ${place.name}`,
+          url: `${window.location.origin}/place/${place.id}`,
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback to copy link
+      copyToClipboard();
     }
   };
 
@@ -82,6 +138,12 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
                 {isSaved ? <Heart className="h-4 w-4 fill-current" /> : <Bookmark className="h-4 w-4" />}
               </button>
             )}
+            <button
+              onClick={handleShare}
+              className="p-2 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 bg-white/80 text-gray-600 hover:bg-white"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
           </div>
         </div>
         
@@ -138,6 +200,38 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
               Book
             </button>
           )}
+        </div>
+      )}
+
+      {/* Share Menu */}
+      {showShareMenu && (
+        <div 
+          ref={shareMenuRef}
+          className="absolute top-16 right-3 bg-white rounded-lg shadow-lg border border-gray-200 p-2 z-20 min-w-[160px]"
+        >
+          <button
+            onClick={shareViaWebAPI}
+            className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+          >
+            <Share2 className="h-4 w-4" />
+            <span>Share</span>
+          </button>
+          <button
+            onClick={copyToClipboard}
+            className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4 text-green-600" />
+                <span className="text-green-600">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4" />
+                <span>Copy Link</span>
+              </>
+            )}
+          </button>
         </div>
       )}
     </div>

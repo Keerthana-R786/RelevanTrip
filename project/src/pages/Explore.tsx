@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, MapPin, Grid, List } from 'lucide-react';
+import { Search, Filter, MapPin, Grid } from 'lucide-react';
 import PlaceCard from '../components/common/PlaceCard';
 import { mockPlaces } from '../data/mockData';
 import { Place } from '../types';
@@ -9,7 +9,6 @@ const Explore: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedEcoTag, setSelectedEcoTag] = useState('all');
   const [selectedCrowd, setSelectedCrowd] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
 
   const categories = ['all', 'restaurant', 'cafe', 'outdoor', 'culture', 'wellness', 'adventure'];
@@ -81,18 +80,9 @@ const Explore: React.FC = () => {
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600">{filteredPlaces.length} places found</span>
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded ${viewMode === 'grid' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}
-              >
+              <div className="p-2 rounded bg-green-500 text-white">
                 <Grid className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded ${viewMode === 'list' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}
-              >
-                <List className="h-4 w-4" />
-              </button>
+              </div>
             </div>
           </div>
         </div>
@@ -150,11 +140,7 @@ const Explore: React.FC = () => {
         )}
 
         {/* Results */}
-        <div className={
-          viewMode === 'grid' 
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
-            : 'space-y-4'
-        }>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPlaces.map(place => (
             <PlaceCard key={place.id} place={place} />
           ))}

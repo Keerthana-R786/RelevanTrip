@@ -103,6 +103,7 @@ export const mockUser: User = {
   name: 'Alex Johnson',
   email: 'alex@example.com',
   avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150',
+  bio: 'Traveler. Food lover. Always seeking sustainable experiences.',
   preferences: {
     moodDetection: true,
     language: 'English',

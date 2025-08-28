@@ -7,6 +7,7 @@ import PlaceCard from '../components/common/PlaceCard';
 const TripPlanner: React.FC = () => {
   const { savedPlaces, tripPlans, setTripPlans } = useApp();
   const [selectedTrip, setSelectedTrip] = useState(tripPlans[0] || null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [newTripName, setNewTripName] = useState('');
   const [showNewTripForm, setShowNewTripForm] = useState(false);
 
@@ -79,6 +80,20 @@ const TripPlanner: React.FC = () => {
   const exportToPDF = () => {
     // Mock PDF export
     alert('PDF export would be implemented here with libraries like jsPDF or Puppeteer');
+  };
+
+  const handleReorder = (fromIndex: number, toIndex: number) => {
+    if (!selectedTrip || fromIndex === toIndex) return;
+    const newPlaces = [...selectedTrip.places];
+    const [moved] = newPlaces.splice(fromIndex, 1);
+    newPlaces.splice(toIndex, 0, moved);
+
+    const updatedTrip = { ...selectedTrip, places: newPlaces };
+    const updatedTrips = tripPlans.map(trip =>
+      trip.id === selectedTrip.id ? updatedTrip : trip
+    );
+    setTripPlans(updatedTrips);
+    setSelectedTrip(updatedTrip);
   };
 
   return (
@@ -245,7 +260,20 @@ const TripPlanner: React.FC = () => {
                   {selectedTrip.places.length > 0 ? (
                     <div className="space-y-4">
                       {selectedTrip.places.map((place, index) => (
-                        <div key={place.id} className="flex items-start space-x-4 p-4 border border-gray-200 rounded-lg">
+                        <div
+                          key={place.id}
+                          className="flex items-start space-x-4 p-4 border border-gray-200 rounded-lg"
+                          onDragOver={(e) => {
+                            if (dragIndex !== null) e.preventDefault();
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            if (dragIndex !== null) {
+                              handleReorder(dragIndex, index);
+                              setDragIndex(null);
+                            }
+                          }}
+                        >
                           <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
                             {index + 1}
                           </div>
@@ -272,7 +300,13 @@ const TripPlanner: React.FC = () => {
                               </div>
                               
                               <div className="flex items-center space-x-2">
-                                <button className="p-1 text-gray-400 hover:text-gray-600">
+                                <button
+                                  className="p-1 text-gray-400 hover:text-gray-600"
+                                  draggable
+                                  onDragStart={() => setDragIndex(index)}
+                                  onDragEnd={() => setDragIndex(null)}
+                                  aria-label="Reorder"
+                                >
                                   <GripVertical className="h-4 w-4" />
                                 </button>
                                 <button

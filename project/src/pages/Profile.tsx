@@ -10,16 +10,21 @@ import {
   Calendar,
   MapPin,
   Settings,
-  Save
+  Save,
+  Download,
+  Trash2,
+  Star
 } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 
 const Profile: React.FC = () => {
-  const { user, setUser } = useApp();
+  const { user, setUser, savedPlaces, tripPlans } = useApp();
   const [activeTab, setActiveTab] = useState('profile');
+  const [loginAlertsEnabled, setLoginAlertsEnabled] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
+    bio: user?.bio || '',
     moodDetection: user?.preferences.moodDetection || false,
     language: user?.preferences.language || 'English',
     privacy: user?.preferences.privacy || false
@@ -31,6 +36,7 @@ const Profile: React.FC = () => {
         ...user,
         name: formData.name,
         email: formData.email,
+        bio: formData.bio,
         preferences: {
           moodDetection: formData.moodDetection,
           language: formData.language,
@@ -39,6 +45,46 @@ const Profile: React.FC = () => {
       });
     }
     alert('Settings saved successfully!');
+  };
+
+  const handleDownloadData = () => {
+    const data = {
+      user,
+      savedPlaces,
+      tripPlans,
+      exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'relevantrip-data.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDeleteAccount = () => {
+    const confirmed = window.confirm('Are you sure you want to permanently delete your account and all data? This action cannot be undone.');
+    if (confirmed) {
+      alert('Account deletion requested. This demo does not actually delete your account.');
+    }
+  };
+
+  const handleChangePassword = () => {
+    const newPassword = window.prompt('Enter a new password (demo):');
+    if (newPassword && newPassword.length >= 6) {
+      alert('Password updated successfully (demo).');
+    } else if (newPassword !== null) {
+      alert('Password must be at least 6 characters.');
+    }
+  };
+
+  const handleLoginAlerts = () => {
+    const next = !loginAlertsEnabled;
+    setLoginAlertsEnabled(next);
+    alert(`Login alerts ${next ? 'enabled' : 'disabled'}.`);
   };
 
   const tabs = [
@@ -70,6 +116,9 @@ const Profile: React.FC = () => {
                 />
                 <h3 className="text-lg font-semibold text-gray-900">{user?.name}</h3>
                 <p className="text-sm text-gray-600">{user?.email}</p>
+                {user?.bio && (
+                  <p className="mt-3 text-sm text-gray-700 px-2">{user.bio}</p>
+                )}
               </div>
 
               {/* Navigation Tabs */}
@@ -127,6 +176,8 @@ const Profile: React.FC = () => {
                     <textarea
                       rows={4}
                       placeholder="Tell us about yourself and your travel preferences..."
+                      value={formData.bio}
+                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
@@ -236,7 +287,7 @@ const Profile: React.FC = () => {
                     <div>
                       <h3 className="text-lg font-medium text-gray-900 mb-4">Data Management</h3>
                       <div className="space-y-4">
-                        <button className="w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <button onClick={handleDownloadData} className="w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                           <div className="flex items-center justify-between">
                             <div>
                               <h4 className="font-medium text-gray-900">Download Your Data</h4>
@@ -246,7 +297,7 @@ const Profile: React.FC = () => {
                           </div>
                         </button>
                         
-                        <button className="w-full text-left p-4 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+                        <button onClick={handleDeleteAccount} className="w-full text-left p-4 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
                           <div className="flex items-center justify-between">
                             <div>
                               <h4 className="font-medium text-red-900">Delete Account</h4>
@@ -261,13 +312,13 @@ const Profile: React.FC = () => {
                     <div>
                       <h3 className="text-lg font-medium text-gray-900 mb-4">Password & Security</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <button onClick={handleChangePassword} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                           <Shield className="h-8 w-8 text-green-500 mx-auto mb-2" />
                           <h4 className="font-medium text-gray-900">Change Password</h4>
                           <p className="text-sm text-gray-600">Update your account password</p>
                         </button>
                         
-                        <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <button onClick={handleLoginAlerts} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                           <Bell className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                           <h4 className="font-medium text-gray-900">Login Alerts</h4>
                           <p className="text-sm text-gray-600">Get notified of account access</p>

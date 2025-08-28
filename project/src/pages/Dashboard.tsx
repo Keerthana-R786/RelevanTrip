@@ -164,13 +164,15 @@ const Dashboard: React.FC = () => {
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <Link
-                  to="/assistant"
-                  className="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-                >
-                  <MessageSquare className="h-5 w-5 text-blue-600 mr-3" />
-                  <span className="font-medium text-blue-900">Ask AI Assistant</span>
-                </Link>
+                {user?.preferences.moodDetection !== false && (
+                  <Link
+                    to="/assistant"
+                    className="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <MessageSquare className="h-5 w-5 text-blue-600 mr-3" />
+                    <span className="font-medium text-blue-900">Ask AI Assistant</span>
+                  </Link>
+                )}
                 <Link
                   to="/trip-planner"
                   className="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"

@@ -9,9 +9,13 @@ import {
   Heart, 
   Bookmark,
   ExternalLink,
+<<<<<<< HEAD
   Share2,
   Copy,
   Check
+=======
+  DollarSign
+>>>>>>> c25b35716aec0623de46f555019edc0e9301a40b
 } from 'lucide-react';
 import { Place } from '../../types';
 import { useApp } from '../../contexts/AppContext';
@@ -179,7 +183,24 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
               </div>
             </div>
             {place.price && (
-              <span className="font-semibold text-green-600">{place.price}</span>
+              <div className="flex items-center space-x-1">
+                {place.price !== 'Free' && <DollarSign className="h-3 w-3 text-gray-500" />}
+                <span className={`font-semibold px-2 py-1 rounded-full text-xs ${
+                  place.price === 'Free' 
+                    ? 'bg-green-100 text-green-800' 
+                    : place.price.includes('$80') || place.price.includes('$150')
+                      ? 'bg-purple-100 text-purple-800'
+                      : place.price.includes('$45') || place.price.includes('$75')
+                        ? 'bg-blue-100 text-blue-800'
+                        : place.price.includes('$25') || place.price.includes('$40')
+                          ? 'bg-orange-100 text-orange-800'
+                          : place.price.includes('$15') || place.price.includes('$25')
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {place.price}
+                </span>
+              </div>
             )}
           </div>
         </div>

@@ -139,6 +139,37 @@ const Explore: React.FC = () => {
           </div>
         )}
 
+        {/* Price Range Legend */}
+        <div className="bg-white p-4 rounded-xl border border-gray-200 mb-6">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Price Ranges</h3>
+          <div className="flex flex-wrap items-center gap-3 text-xs">
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-green-100 rounded-full"></span>
+              <span className="text-gray-600">Free</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-yellow-100 rounded-full"></span>
+              <span className="text-gray-600">$8-15 (Budget)</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-yellow-100 rounded-full"></span>
+              <span className="text-gray-600">$15-25 (Affordable)</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-orange-100 rounded-full"></span>
+              <span className="text-gray-600">$25-40 (Moderate)</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-blue-100 rounded-full"></span>
+              <span className="text-gray-600">$45-75 (Premium)</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="w-3 h-3 bg-purple-100 rounded-full"></span>
+              <span className="text-gray-600">$80-150 (Luxury)</span>
+            </div>
+          </div>
+        </div>
+
         {/* Results */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPlaces.map(place => (

@@ -14,8 +14,13 @@ import {
 import { ChatMessage } from '../types';
 import { mockPlaces } from '../data/mockData';
 import PlaceCard from '../components/common/PlaceCard';
+import { useApp } from '../contexts/AppContext';
 
 const AIAssistant: React.FC = () => {
+  const { user } = useApp();
+  if (user && user.preferences && user.preferences.moodDetection === false) {
+    return null;
+  }
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
